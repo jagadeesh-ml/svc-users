@@ -1,0 +1,12 @@
+name: svc-users-ci
+on:
+  pull_request:
+    paths: [ "src/**", "Dockerfile", "package.json" ]
+  push:
+    branches: [ "main" ]
+jobs:
+  build-test:
+    uses: Jagadeesh-ml/platform/.github/workflows/reusable-ci.yml@main
+    with:
+      service_name: svc-users
+      path_filter: "."

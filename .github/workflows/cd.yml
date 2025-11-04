@@ -1,0 +1,37 @@
+name: promote-to-dev
+on:
+  push:
+    branches: [ "main" ]
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Compute tag
+        id: meta
+        run: echo "tag=sha-${GITHUB_SHA}" >> $GITHUB_OUTPUT
+
+      - name: Checkout env repo
+        uses: actions/checkout@v4
+        with:
+          repository: Jagadeesh-ml/env
+          token: ${{ secrets.ENV_REPO_PAT }}
+
+      - name: Install yq
+        run: |
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.44.3/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+
+      - name: Update image tag
+        run: |
+          yq -i '.image.tag = "${{ steps.meta.outputs.tag }}"' apps/svc-users/dev/values.yaml
+          git config user.email "ci@users.noreply.github.com"
+          git config user.name "ci-bot"
+          git checkout -b bump-users-${{ steps.meta.outputs.tag }}
+          git commit -am "users → dev ${{ steps.meta.outputs.tag }}"
+          git push origin HEAD
+
+      - name: Open PR to env
+        run: |
+          gh pr create --repo Jagadeesh-ml/env \
+            --title "users → dev ${{ steps.meta.outputs.tag }}" \
+            --body "Auto bump from svc-users"
