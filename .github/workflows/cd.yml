@@ -18,7 +18,7 @@ jobs:
       - name: Checkout env repo
         uses: actions/checkout@v4
         with:
-          repository: Jagadeesh-ml/env
+          repository: jagadeesh-ml/env
           token: ${{ secrets.ENV_REPO_PAT }}
 
       - name: Install yq
@@ -26,7 +26,7 @@ jobs:
           sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.44.3/yq_linux_amd64
           sudo chmod +x /usr/local/bin/yq
 
-      - name: Update image tag and push branch
+      - name: Update image tag
         run: |
           yq -i '.image.tag = "${{ steps.meta.outputs.tag }}"' apps/svc-users/dev/values.yaml
           git config user.email "ci@users.noreply.github.com"
@@ -39,6 +39,6 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.ENV_REPO_PAT }}
         run: |
-          gh pr create --repo Jagadeesh-ml/env \
+          gh pr create --repo jagadeesh-ml/env \
             --title "users → dev ${{ steps.meta.outputs.tag }}" \
             --body "Auto bump from svc-users"
