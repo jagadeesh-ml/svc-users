@@ -6,3 +6,4 @@ const server = http.createServer((req, res) => {
   res.end(JSON.stringify({ service: 'users', status: 'running' }));
 });
 server.listen(port, () => console.log(`Users service on ${port}`));
+// trigger build
